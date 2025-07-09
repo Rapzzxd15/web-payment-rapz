@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAPZ Payment Gateway</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --primary: #6a11cb;
+            --secondary: #2575fc;
+            --accent: #ff4d4d;
+            --text: #ffffff;
+            --glass: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --glass-highlight: rgba(255, 255, 255, 0.2);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            overflow-x: hidden;
+            background: linear-gradient(-45deg, #1a1a2e, #16213e, #0f3460, #533483);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--text);
+            scroll-behavior: smooth;
+            position: relative;
+        }
+        
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        /* Floating Particles */
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: float 15s infinite linear;
+        }
+        
+        @keyframes float {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(calc(100vw * 0.1), calc(100vh * 0.1)) rotate(90deg); }
+            50% { transform: translate(calc(100vw * 0.2), 0) rotate(180deg); }
+            75% { transform: translate(calc(100vw * 0.1), calc(100vh * -0.1)) rotate(270deg); }
+            100% { transform: translate(0, 0) rotate(360deg); }
+        }
+        
+        /* Main Container */
+        .container {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 2.5rem;
+            width: 95%;
+            max-width: 500px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--glass-border);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            margin: 2rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to bottom right,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0.1) 50%,
+                rgba(255, 255, 255, 0) 100%
+            );
+            transform: rotate(30deg);
+            animation: shine 8s infinite;
+            z-index: -1;
+        }
+        
+        @keyframes shine {
+            0% { transform: translateX(-100%) rotate(30deg); }
+            100% { transform: translateX(100%) rotate(30deg); }
+        }
+        
+        .container:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.4);
+        }
+        
+        /* Welcome Section */
+        .welcome-section {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            animation: fadeIn 1s ease-out;
+        }
+        
+        .welcome-title {
+            font-weight: 700;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            position: relative;
+            display: inline-block;
+            background: linear-gradient(90deg, #ff4d4d, #f9cb28);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: 1px;
+        }
+        
+        .welcome-subtitle {
+            font-weight: 300;
+            opacity: 0.9;
+            font-size: 1rem;
+            letter-spacing: 0.5px;
+            margin-top: 10px;
+        }
+        
+        /* Payment Methods */
+        .payment-method {
+            margin-bottom: 1.5rem;
+            background: var(--glass);
+            padding: 1.5rem;
+            border-radius: 15px;
+            transition: all 0.4s ease;
+            animation: slideUp 0.8s ease-out;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--glass-border);
+        }
+        
+        .payment-method::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--primary), var(--secondary));
+            transition: all 0.3s ease;
+        }
+        
+        .payment-method:hover {
+            background: var(--glass-highlight);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .payment-method:hover::before {
+            width: 8px;
+        }
+        
+        .payment-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .payment-icon {
+            width: 40px;
+            height: 40px;
+            margin-right: 15px;
+            object-fit: contain;
+            filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.2));
+        }
+        
+        .payment-name {
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+        
+        .payment-detail {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+        
+        .payment-number {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 0.8rem 1rem;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .payment-number:hover {
+            background: rgba(0, 0, 0, 0.3);
+            transform: scale(1.02);
+        }
+        
+        .copy-btn {
+            background: linear-gradient(45deg, #ff9a9e, #fad0c4);
+            border: none;
+            color: #333;
+            padding: 0.3rem 0.8rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .copy-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* QRIS Section */
+        .qris-section {
+            text-align: center;
+            margin-top: 1.5rem;
+            animation: fadeIn 1s ease;
+        }
+        
+        .qris-title {
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+        
+        .qris-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            transition: all 0.4s ease;
+            border: 2px solid var(--glass-border);
+        }
+        
+        .qris-image:hover {
+            transform: scale(1.03);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+        
+        /* Footer Note */
+        .footer-note {
+            text-align: center;
+            margin-top: 2rem;
+            font-size: 0.75rem;
+            opacity: 0.7;
+            animation: fadeIn 2s ease;
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Responsive Adjustments */
+        @media (max-width: 480px) {
+            .container {
+                padding: 1.5rem;
+                border-radius: 20px;
+            }
+            
+            .welcome-title {
+                font-size: 1.6rem;
+            }
+            
+            .payment-method {
+                padding: 1.2rem;
+            }
+            
+            .payment-icon {
+                width: 35px;
+                height: 35px;
+            }
+            
+            .payment-name {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="particles" id="particles"></div>
+    
+    <div class="container">
+        <div class="welcome-section">
+            <h1 class="welcome-title">HAI WELCOME TO WEB PAYMENT RAPZ</h1>
+            <p class="welcome-subtitle">Please select your payment method below</p>
+        </div>
+        
+        <div class="payment-method" style="animation-delay: 0.2s">
+            <div class="payment-title">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/7/72/Logo_dana_blue.svg" alt="DANA" class="payment-icon">
+                <h3 class="payment-name">DANA</h3>
+            </div>
+            <div class="payment-detail">
+                <div class="payment-number">
+                    <span>087864252521</span>
+                    <button class="copy-btn" onclick="copyToClipboard('087864252521')">Copy</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="payment-method" style="animation-delay: 0.4s">
+            <div class="payment-title">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Gopay_logo.svg/1200px-Gopay_logo.svg.png" alt="GOPAY" class="payment-icon">
+                <h3 class="payment-name">GOPAY</h3>
+            </div>
+            <div class="payment-detail">
+                <div class="payment-number">
+                    <span>-</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="payment-method" style="animation-delay: 0.6s">
+            <div class="payment-title">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/Logo_ovo_purple.svg/1200px-Logo_ovo_purple.svg.png" alt="OVO" class="payment-icon">
+                <h3 class="payment-name">OVO</h3>
+            </div>
+            <div class="payment-detail">
+                <div class="payment-number">
+                    <span>-</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="payment-method" style="animation-delay: 0.8s">
+            <div class="payment-title">
+                <img src="https://qris.id/wp-content/uploads/2021/09/QRIS-Logo-Vector-PNG-1024x1024.png" alt="QRIS" class="payment-icon">
+                <h3 class="payment-name">QRIS</h3>
+            </div>
+            <div class="qris-section">
+                <img src="https://files.catbox.moe/7f3mdj.jpg" alt="QR Code" class="qris-image">
+            </div>
+        </div>
+        
+        <p class="footer-note">Please confirm to admin after payment</p>
+    </div>
+    
+    <script>
+        // Create floating particles
+        function createParticles() {
+            const container = document.getElementById('particles');
+            const particleCount = window.innerWidth < 768 ? 20 : 30;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // Random properties
+                const size = Math.random() * 6 + 2;
+                const posX = Math.random() * 100;
+                const posY = Math.random() * 100;
+                const opacity = Math.random() * 0.4 + 0.1;
+                const delay = Math.random() * 5;
+                const duration = Math.random() * 15 + 10;
+                
+                // Apply properties
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${posX}%`;
+                particle.style.top = `${posY}%`;
+                particle.style.opacity = opacity;
+                particle.style.animationDelay = `${delay}s`;
+                particle.style.animationDuration = `${duration}s`;
+                
+                container.appendChild(particle);
+            }
+        }
+        
+        // Copy to clipboard function with sweet alert
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                // Create notification element
+                const notification = document.createElement('div');
+                notification.style.position = 'fixed';
+                notification.style.top = '20px';
+                notification.style.left = '50%';
+                notification.style.transform = 'translateX(-50%)';
+                notification.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+                notification.style.color = 'white';
+                notification.style.padding = '12px 24px';
+                notification.style.borderRadius = '8px';
+                notification.style.zIndex = '1000';
+                notification.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.3)';
+                notification.style.animation = 'fadeIn 0.3s ease';
+                notification.textContent = `Copied: ${text}`;
+                
+                document.body.appendChild(notification);
+                
+                // Remove after 2 seconds
+                setTimeout(() => {
+                    notification.style.animation = 'fadeOut 0.5s ease';
+                    setTimeout(() => {
+                        document.body.removeChild(notification);
+                    }, 500);
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+            });
+        }
+        
+        // Initialize when page loads
+        window.addEventListener('load', () => {
+            createParticles();
+            
+            // Add fadeOut animation
+            const style = document.createElement('style');
+            style.innerHTML = `
+                @keyframes fadeOut {
+                    from { opacity: 1; }
+                    to { opacity: 0; }
+                }
+            `;
+            document.head.appendChild(style);
+        });
+    </script>
+</body>
+</html>
